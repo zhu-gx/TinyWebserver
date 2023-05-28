@@ -4,6 +4,9 @@
 #include<arpa/inet.h>//sockaddr_in
 #include<cstring>//bzero
 #include<unistd.h>//read&write
+#include<sys/epoll.h>//epoll
+
+#define BUFFER_SIZE 1024
 
 void errif(bool condition,const char* errmsg);//错误处理函数
 
@@ -20,7 +23,7 @@ int main(){
 
     //使用read和wirte对网络连接进行读写
     while(true){
-        char buf[1024];//定义缓冲区
+        char buf[BUFFER_SIZE];//定义缓冲区
         bzero(&buf,sizeof(buf));//清空缓冲区
         scanf("%s",buf);//从键盘读取数据，写入缓冲区
         ssize_t write_bytes = write(sockfd,buf,sizeof(buf));//发送缓冲区中的数据到服务器socket，返回已发送数据大小
@@ -39,6 +42,8 @@ int main(){
             errif(true,"socket read error");
         }
     }
+    close(sockfd);
+    return 0;
 }
 
 //异常退出
