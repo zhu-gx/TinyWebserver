@@ -12,6 +12,7 @@
 #include"Epoll.h"
 #include"InetAddress.h"
 #include"Socket.h"
+#include"Channel.h"
 
 
 #define MAX_EVENTS 1024//epoll结构体最大事件大小
@@ -26,20 +27,25 @@ int main(){
     server_socket->listen();
     Epoll *ep = new Epoll();
     server_socket->setnonblocking();
-    ep->addFd(server_socket->getFd(),EPOLLIN | EPOLLET);
+    //ep->addFd(server_socket->getFd(),EPOLLIN | EPOLLET);
+    Channel *serverChannel = new Channel(ep,server_socket->getFd());
+    serverChannel->enableReading();
     while(true){
-        std::vector<epoll_event> events = ep->poll();
-        int nfds = events.size();
+        std::vector<Channel*> activeChannels = ep->poll();
+        int nfds = activeChannels.size();
         for(int i = 0;i < nfds;i++){
-            if(events[i].data.fd == server_socket->getFd()){
+            int chfd = activeChannels[i]->getFd();
+            if(chfd == server_socket->getFd()){
                 //新客户端连接
                 InetAddress *client_addr = new InetAddress();//没有delete，会发生内存泄漏
                 Socket *client_socket = new Socket(server_socket->accept(client_addr));//内存泄漏
                 printf("new client fd %d!\nIP:%s\nPort:%d\n",client_socket->getFd(),inet_ntoa(client_addr->addr.sin_addr),ntohs(client_addr->addr.sin_port));
                 client_socket->setnonblocking();
-                ep->addFd(client_socket->getFd(),EPOLLIN|EPOLLET);
-            }else if(events[i].events & EPOLLIN){//可读事件
-                handleReadEvent(events[i].data.fd);
+                Channel *clientChannel = new Channel(ep,client_socket->getFd());
+                //ep->addFd(client_socket->getFd(),EPOLLIN|EPOLLET);
+                clientChannel->enableReading();
+            }else if(activeChannels[i]->getEvents() & EPOLLIN){//可读事件
+                handleReadEvent(activeChannels[i]->getFd());
             }else{
                 //其他事件，之后的版本实现
                 printf("sonething else happened\n");
