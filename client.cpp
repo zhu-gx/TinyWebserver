@@ -1,14 +1,13 @@
 #include<sys/socket.h>
-#include<stdlib.h>//exit
-#include<stdio.h>//perror
 #include<arpa/inet.h>//sockaddr_in
 #include<cstring>//bzero
 #include<unistd.h>//read&write
 #include<sys/epoll.h>//epoll
+#include"errif.h"//errif
 
 #define BUFFER_SIZE 1024
 
-void errif(bool condition,const char* errmsg);//错误处理函数
+
 
 int main(){
     int sockfd = socket(AF_INET,SOCK_STREAM,0);
@@ -23,7 +22,7 @@ int main(){
 
     //使用read和wirte对网络连接进行读写
     while(true){
-        char buf[BUFFER_SIZE];//定义缓冲区
+        char buf[BUFFER_SIZE];//缓冲区大小必须大于等于服务端buf大小，因为服务端使用ET模式，必须一次读取整个服务区buf的大小的数据
         bzero(&buf,sizeof(buf));//清空缓冲区
         scanf("%s",buf);//从键盘读取数据，写入缓冲区
         ssize_t write_bytes = write(sockfd,buf,sizeof(buf));//发送缓冲区中的数据到服务器socket，返回已发送数据大小
@@ -46,10 +45,3 @@ int main(){
     return 0;
 }
 
-//异常退出
-void errif(bool condition,const char* errmsg){
-    if(condition){
-        perror(errmsg);
-        exit(EXIT_FAILURE);
-    }
-}
