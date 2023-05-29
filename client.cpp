@@ -3,7 +3,8 @@
 #include<cstring>//bzero
 #include<unistd.h>//read&write
 #include<sys/epoll.h>//epoll
-#include"errif.h"//errif
+#include"src/errif.h"//errif
+#include<cstdio>
 
 #define BUFFER_SIZE 1024
 
