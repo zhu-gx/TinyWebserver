@@ -13,7 +13,7 @@
 
 Server::Server(EventLoop *_loop) : loop(_loop){    
     Socket *serv_sock = new Socket();
-    InetAddress *serv_addr = new InetAddress("127.0.0.1", 8888);
+    InetAddress *serv_addr = new InetAddress("127.0.0.1", 9999);
     serv_sock->bind(serv_addr);
     serv_sock->listen(); 
     serv_sock->setnonblocking();
