@@ -12,7 +12,7 @@ EventLoop::~EventLoop()
     delete ep;
 }
 
-
+//相当于原函数中调用epoll_wait()的死循环
 void EventLoop::loop(){
     while(!quit){
     std::vector<Channel*> chs;

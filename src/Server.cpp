@@ -2,6 +2,7 @@
 #include "Socket.h"
 #include "InetAddress.h"
 #include "Channel.h"
+#include"Acceptor.h"
 #include <functional>
 #include <string.h>
 #include <unistd.h>
@@ -11,23 +12,15 @@
 
 #define READ_BUFFER 1024
 
-Server::Server(EventLoop *_loop) : loop(_loop){    
-    Socket *serv_sock = new Socket();
-    InetAddress *serv_addr = new InetAddress("127.0.0.1", 9999);
-    serv_sock->bind(serv_addr);
-    serv_sock->listen(); 
-    serv_sock->setnonblocking();
-       
-    Channel *servChannel = new Channel(loop, serv_sock->getFd());
-    std::function<void()> cb = std::bind(&Server::newConnection, this, serv_sock);
-    servChannel->setCallback(cb);
-    servChannel->enableReading();
-
+Server::Server(EventLoop *_loop) : loop(_loop),acceptor(nullptr){    
+    acceptor = new Acceptor(loop);
+    std::function<void(Socket*)> cb = std::bind(&Server::newConnection,this,std::placeholders::_1);
+    acceptor->setNewConnectionCallback(cb);
 }
 
 Server::~Server()
 {
-    
+    delete acceptor;
 }
 
 void Server::handleReadEvent(int sockfd){
