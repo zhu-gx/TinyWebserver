@@ -2,8 +2,7 @@
 #include <sys/epoll.h>
 #include <functional>
 class EventLoop;
-class Channel
-{
+class Channel{
 private:
     EventLoop *loop;
     int fd;
