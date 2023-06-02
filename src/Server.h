@@ -19,6 +19,6 @@ public:
 
     void handleReadEvent(int);//处理客户端请求
     void newConnection(Socket *serv_sock);//新建TCP连接
-    void deleteConnection(Socket *sock);//断开TCP连接
+    void deleteConnection(int sock);//断开TCP连接
 };
 

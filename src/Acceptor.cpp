@@ -4,16 +4,17 @@
 #include"Channel.h"
 #include<stdio.h>
 
-Acceptor::Acceptor(EventLoop *_loop) : loop(_loop){
+Acceptor::Acceptor(EventLoop *_loop) : loop(_loop),sock(nullptr),acceptChannel(nullptr){
     sock = new Socket();
     InetAddress *addr = new InetAddress("127.0.0.1",9999);
     sock->bind(addr);
     sock->listen();
-    sock->setnonblocking();
+    //sock->setnonblocking();
     acceptChannel = new Channel(loop,sock->getFd());
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection,this);
-    acceptChannel->setCallback(cb);
+    acceptChannel->setReadCallback(cb);
     acceptChannel->enableReading();
+    acceptChannel->setUseThreadPool(false);
     delete addr;
 }
 

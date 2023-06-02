@@ -4,13 +4,13 @@
 #include"ThreadPool.h"
 #include <vector>
 
-EventLoop::EventLoop() : ep(nullptr), quit(false){
+EventLoop::EventLoop() : ep(nullptr),threadPool(nullptr),quit(false){
     ep = new Epoll();
     threadPool = new ThreadPool();
 }
 
-EventLoop::~EventLoop()
-{
+EventLoop::~EventLoop(){
+    delete threadPool;
     delete ep;
 }
 
