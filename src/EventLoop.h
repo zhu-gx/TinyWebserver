@@ -8,13 +8,11 @@
 //然后根据不同的描述符、事件类型进行处理（以回调函数的方式）
 class Epoll;
 class Channel;
-class ThreadPool;
 class EventLoop
 {
 private:
     Epoll *ep;
     bool quit;
-    ThreadPool *threadPool;
 public:
     EventLoop();
     ~EventLoop();

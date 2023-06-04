@@ -10,7 +10,7 @@ private:
     uint32_t events;
     uint32_t ready;
     bool inEpoll;
-    bool useThreadPool;
+    //bool useThreadPool;
     std::function<void()> readcallback;
     std::function<void()> writecallback;
 public:
@@ -30,6 +30,6 @@ public:
     // void setEvents(uint32_t);
     void setReady(uint32_t);
     void setReadCallback(std::function<void()>);
-    void setUseThreadPool(bool use = true);
+    //void setUseThreadPool(bool use = true);
 };
 

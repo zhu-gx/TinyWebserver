@@ -4,7 +4,6 @@
 
 #include"src/errif.h"
 #include"src/Buffer.h"
-#include"src/InetAddress.h"
 #include"src/Socket.h"
 
 using namespace std;

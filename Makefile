@@ -6,11 +6,11 @@ server:
 	server.cpp \
 	-o server
 client:
-	g++ src/errif.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp client.cpp -o client
+	g++ src/errif.cpp src/Buffer.cpp src/Socket.cpp client.cpp -o client
 th:
 	g++ -pthread src/ThreadPool.cpp ThreadPoolTest.cpp -o ThreadPoolTest
 test:
-	g++ src/errif.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp src/ThreadPool.cpp \
+	g++ src/errif.cpp src/Buffer.cpp src/Socket.cpp src/ThreadPool.cpp \
 	-pthread \
 	test.cpp -o test
 clean:

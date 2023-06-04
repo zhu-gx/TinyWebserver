@@ -4,8 +4,7 @@
 #include<unistd.h>
 
 Channel::Channel(EventLoop *_loop, int _fd)
-: loop(_loop), fd(_fd), events(0), ready(0), inEpoll(false),useThreadPool(true){
-
+: loop(_loop), fd(_fd), events(0), ready(0), inEpoll(false){
 }
 
 Channel::~Channel(){
@@ -17,23 +16,15 @@ Channel::~Channel(){
 
 void Channel::handleEvent(){
     if(ready & (EPOLLIN | EPOLLPRI)){
-        if(useThreadPool){
-            loop->addThread(readcallback);
-        }else{
-            readcallback();
-        }
+        readcallback();
     }
     if(ready & EPOLLOUT){
-        if(useThreadPool){
-            loop->addThread(writecallback);
-        }else{
-            writecallback();
-        }
+        writecallback();
     }
 }
 
 void Channel::enableReading(){
-    events = EPOLLIN | EPOLLPRI;
+    events |= EPOLLIN | EPOLLPRI;
     loop->updateChannel(this);
 }
 
@@ -67,8 +58,4 @@ void Channel::setReady(uint32_t _ev){
 
 void Channel::setReadCallback(std::function<void()> _cb){
     readcallback = _cb;
-}
-
-void Channel::setUseThreadPool(bool use){
-    useThreadPool = use;
 }
