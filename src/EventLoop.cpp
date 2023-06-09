@@ -1,27 +1,22 @@
-#include "EventLoop.h"
-#include "Epoll.h"
-#include "Channel.h"
+#include "./include/EventLoop.h"
+
 #include <vector>
 
-EventLoop::EventLoop() : ep(nullptr),quit(false){
-    ep = new Epoll();
-}
+#include "./include/Channel.h"
+#include "./include/Epoll.h"
 
-EventLoop::~EventLoop(){
-    delete ep;
-}
+EventLoop::EventLoop() { epoll_ = new Epoll(); }
 
-//相当于原函数中调用epoll_wait()的死循环
-void EventLoop::loop(){
-    while(!quit){
-    std::vector<Channel*> chs;
-        chs = ep->poll();
-        for(auto it = chs.begin(); it != chs.end(); ++it){
-            (*it)->handleEvent();
-        }
+EventLoop::~EventLoop() { delete epoll_; }
+
+void EventLoop::Loop() {
+  while (!quit_) {
+    std::vector<Channel *> chs;
+    chs = epoll_->Poll();
+    for (auto &ch : chs) {
+      ch->HandleEvent();
     }
+  }
 }
 
-void EventLoop::updateChannel(Channel *ch){
-    ep->updateChannel(ch);
-}
+void EventLoop::UpdateChannel(Channel *ch) { epoll_->UpdateChannel(ch); }

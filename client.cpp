@@ -2,9 +2,9 @@
 #include<unistd.h>
 #include<string.h>
 
-#include"src/errif.h"
-#include"src/Buffer.h"
-#include"src/Socket.h"
+#include"./src/include/errif.h"
+#include"./src/include/Buffer.h"
+#include"./src/include/Socket.h"
 
 using namespace std;
 
