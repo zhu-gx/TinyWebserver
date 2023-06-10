@@ -14,7 +14,7 @@
 
 Connection::Connection(EventLoop *loop, Socket *sock) : loop_(loop), sock_(sock) {
   if (loop_ != nullptr) {
-    channel_ = new Channel(loop_, sock->GetFd());
+    channel_ = new Channel(loop_, sock_);
     channel_->EnableRead();
     channel_->UseET();
   }
@@ -67,10 +67,12 @@ void Connection::ReadNonBlocking() {
     } else if (bytes_read == 0) {  // EOF，客户端断开连接
       printf("read EOF, client fd %d disconnected\n", sockfd);
       state_ = State::Closed;
+      Close();
       break;
     } else {
       printf("Other error on client fd %d\n", sockfd);
       state_ = State::Closed;
+      Close();
       break;
     }
   }
@@ -135,6 +137,16 @@ void Connection::WriteBlocking() {
   }
 }
 
+void Connection::Send(std::string msg) {
+  SetSendBuffer(msg.c_str());
+  Write();
+}
+
+void Connection::Business() {
+  Read();
+  on_message_callback_(this);
+}
+
 void Connection::Close() { delete_connectioin_callback_(sock_); }
 
 Connection::State Connection::GetState() { return state_; }
@@ -149,7 +161,13 @@ void Connection::SetDeleteConnectionCallback(std::function<void(Socket *)> const
 }
 void Connection::SetOnConnectCallback(std::function<void(Connection *)> const &callback) {
   on_connect_callback_ = callback;
-  channel_->SetReadCallback([this]() { on_connect_callback_(this); });
+  // channel_->SetReadCallback([this]() { on_connect_callback_(this); });
+}
+
+void Connection::SetOnMessageCallback(std::function<void(Connection *)> const &callback) {
+  on_message_callback_ = callback;
+  std::function<void()> bus = std::bind(&Connection::Business, this);
+  channel_->SetReadCallback(bus);
 }
 
 void Connection::GetlineSendBuffer() { send_buffer_->Getline(); }
